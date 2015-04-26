@@ -1,6 +1,6 @@
 {
     "name": "node-auth",
-    "version": "0.0.1",
+    "version": "0.0.1-alpha",
     "description": "a security sophisticated module for oauth2 & registration flow",
     "author": "Evangelos Pappas <epappas@evalonlabs.com>",
     "engine": "node >= 0.10.x",
