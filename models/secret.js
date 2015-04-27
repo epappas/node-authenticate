@@ -33,6 +33,7 @@
  * *******************************************************************/
 
 var joi = require('joi');
+var uuid = require('node-uuid');
 var bcrypt = require('bcrypt');
 
 /**
@@ -61,6 +62,7 @@ module.exports = function SecretModel(config, nano) {
         key: joi.string().alphanum(),
         srpsalt: joi.string().default(generateSalt),
         verifier: joi.string(),
+        password: joi.string(),
         prime: joi.string(),
         generator: joi.string(),
         userPrimeBytes: joi.string(),
@@ -82,6 +84,8 @@ module.exports = function SecretModel(config, nano) {
                     if (err) return callback(err);
                     value.verifier = hash;
                     value.srpsalt = salt;
+                    delete value.password;
+
                     joi.validate(value, schema, callback);
                 });
             });

@@ -32,6 +32,8 @@
  *  @end
  * *******************************************************************/
 
+var events = require('events');
+
 module.exports = function AuthModule(config) {
     config = config || {};
     config.nano = config.nano || require('nano')('http://localhost:5984');
