@@ -57,15 +57,15 @@ module.exports = function AccessTokenModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey),
-        key: joi.string().alphanum().default(generateUuid),
-        salt: joi.string().alphanum().default(generateSalt),
+        _id: joi.string().alphanum().default(cloneKey, '_id'),
+        key: joi.string().alphanum().default(generateUuid, 'key'),
+        salt: joi.string().alphanum().default(generateSalt, 'salt'),
         relkey: joi.string().alphanum(),
-        expires: joi.number().default(generateExpiration),
+        expires: joi.number().default(generateExpiration, 'expires'),
         scope: [joi.string()],
         grantTypeList: [joi.string()],
         redirectUri: [joi.string()],
-        created: joi.number().default(Date.now)
+        created: joi.number().default(Date.now, 'created')
     });
 
     return {

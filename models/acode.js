@@ -57,16 +57,16 @@ module.exports = function AccessCodeModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey),
-        key: joi.string().alphanum().default(generateUuid),
+        _id: joi.string().alphanum().default(cloneKey, '_id'),
+        key: joi.string().alphanum().default(generateUuid, 'key'),
         relkey: joi.string().alphanum(),
-        code: joi.string().alphanum().default(generateUuid),
+        code: joi.string().alphanum().default(generateUuid, 'code'),
         decision: joi.boolean().validate(true),
         redirectUri: joi.string().uri(),
         state: joi.any().default({}),
-        expires: joi.number().default(generateExpiration),
+        expires: joi.number().default(generateExpiration, 'expires'),
         scope: [joi.string()],
-        created: joi.number().default(Date.now)
+        created: joi.number().default(Date.now, 'created')
     });
 
     return {

@@ -57,12 +57,12 @@ module.exports = function OpenKeyModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey),
-        key: joi.string().alphanum().default(generateUuid),
+        _id: joi.string().alphanum().default(cloneKey, '_id'),
+        key: joi.string().alphanum().default(generateUuid, 'key'),
         ukey: joi.string().alphanum(),
         scope: [joi.string()],
         grantTypeList: [joi.string()],
-        created: joi.number().default(Date.now)
+        created: joi.number().default(Date.now, 'created')
     });
 
     return {

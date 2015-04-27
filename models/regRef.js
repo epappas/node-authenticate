@@ -57,13 +57,13 @@ module.exports = function RegRefModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey),
-        key: joi.string().alphanum().default(generateUuid),
+        _id: joi.string().alphanum().default(cloneKey, '_id'),
+        key: joi.string().alphanum().default(generateUuid, 'key'),
         relkey: joi.string().alphanum(),
         state:  joi.any().default({}),
-        expires: joi.number().default(generateExpiration),
+        expires: joi.number().default(generateExpiration, 'expires'),
         scope: [joi.string().alphanum()],
-        created: joi.number().default(Date.now)
+        created: joi.number().default(Date.now, 'created')
     });
 
     return {

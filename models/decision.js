@@ -57,13 +57,13 @@ module.exports = function DecisionModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey),
-        key: joi.string().alphanum().default(generateUuid),
+        _id: joi.string().alphanum().default(cloneKey, '_id'),
+        key: joi.string().alphanum().default(generateUuid, 'key'),
         redirectUri: joi.string().uri(),
-        html: joi.string().default(generateHtml),
-        expires: joi.number().default(generateExpiration),
+        html: joi.string().default(generateHtml, 'html'),
+        expires: joi.number().default(generateExpiration, 'expires'),
         scope: [joi.string()],
-        created: joi.number().default(Date.now)
+        created: joi.number().default(Date.now, 'created')
     });
 
     return {

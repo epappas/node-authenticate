@@ -58,9 +58,9 @@ module.exports = function SecretModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey),
+        _id: joi.string().alphanum().default(cloneKey, '_id'),
         key: joi.string().alphanum(),
-        srpsalt: joi.string().default(generateSalt),
+        srpsalt: joi.string().default(generateSalt, 'srpsalt'),
         verifier: joi.string(),
         password: joi.string(),
         prime: joi.string(),
@@ -70,7 +70,7 @@ module.exports = function SecretModel(config, nano) {
         version: joi.string(),
         privKey: joi.string(),
         factor: joi.string(),
-        created: joi.number().default(Date.now)
+        created: joi.number().default(Date.now, 'created')
     });
 
     return {

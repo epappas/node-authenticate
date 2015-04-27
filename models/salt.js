@@ -57,10 +57,10 @@ module.exports = function SaltModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey),
+        _id: joi.string().alphanum().default(cloneKey, '_id'),
         key: joi.string().alphanum(),
-        salt: joi.string().alphanum().default(generateSalt),
-        created: joi.number().default(Date.now)
+        salt: joi.string().alphanum().default(generateSalt, 'salt'),
+        created: joi.number().default(Date.now, 'created')
     });
 
     return {
