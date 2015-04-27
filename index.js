@@ -55,9 +55,9 @@ module.exports = function AuthModule(config) {
         }
     };
 
-    exports.registration = require('./lib/registration')(exports.models, exports.events, config);
-    exports.auth = require('./lib/auth')(exports.models, exports.events, config);
-    exports.token = require('./lib/token')(exports.models, exports.events, config);
+    exports.registration    = require('./lib/registration')(exports.models, exports.events, config.registration);
+    exports.auth            = require('./lib/auth')(exports.models, exports.events, config.auth);
+    exports.token           = require('./lib/token')(exports.models, exports.events, config.token);
 
     return exports;
 };
