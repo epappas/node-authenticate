@@ -41,9 +41,20 @@ var crypto = require('crypto');
  * @returns {{validate: Md5KeyModelValidate, create: Md5KeyModelCreate, insert: Md5KeyModelInsert, get: Md5KeyModelGet, find: Md5KeyModelFind, update: Md5KeyModelUpdate, remove: Md5KeyModelRemove}}
  * @constructor
  */
-module.exports = function Md5KeyModel(config) {
-    var nano = config.nano;
-    var db = nano.use(config.md5keyUrl);
+module.exports = function Md5KeyModel(config, nano) {
+    config = config || {};
+    var myConfig = (config.md5key = config.md5key || {});
+
+    var db = myConfig.db || (function (myConfig, nano) {
+        nano.db.get(myConfig.dbPath, function(err) {
+            if (err) {
+                nano.db.create(myConfig.dbPath, function(err) {
+                    if (err) throw err
+                });
+            }
+        });
+        return nano.use(myConfig.dbPath);
+    })(myConfig, nano);
 
     var schema = joi.object().keys({
         _id: joi.string().alphanum().default(cloneKey),
@@ -63,13 +74,19 @@ module.exports = function Md5KeyModel(config) {
         create: function Md5KeyModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, callback);
+                db.insert(value, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         insert: function Md5KeyModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, key || value.key, callback);
+                db.insert(value, key || value.key, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         get: function Md5KeyModelGet(key, callback) {

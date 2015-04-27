@@ -41,9 +41,20 @@ var uuid = require('node-uuid');
  * @returns {{validate: RegRefModelValidate, create: RegRefModelCreate, insert: RegRefModelInsert, get: RegRefModelGet, find: RegRefModelFind, update: RegRefModelUpdate, remove: RegRefModelRemove}}
  * @constructor
  */
-module.exports = function RegRefModel(config) {
-    var nano = config.nano;
-    var db = nano.use(config.regrefUrl);
+module.exports = function RegRefModel(config, nano) {
+    config = config || {};
+    var myConfig = (config.regref = config.regref || {});
+
+    var db = myConfig.db || (function (myConfig, nano) {
+        nano.db.get(myConfig.dbPath, function(err) {
+            if (err) {
+                nano.db.create(myConfig.dbPath, function(err) {
+                    if (err) throw err
+                });
+            }
+        });
+        return nano.use(myConfig.dbPath);
+    })(myConfig, nano);
 
     var schema = joi.object().keys({
         _id: joi.string().alphanum().default(cloneKey),
@@ -62,13 +73,19 @@ module.exports = function RegRefModel(config) {
         create: function RegRefModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, callback);
+                db.insert(value, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         insert: function RegRefModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, key || value.key, callback);
+                db.insert(value, key || value.key, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         get: function RegRefModelGet(key, callback) {

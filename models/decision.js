@@ -41,9 +41,20 @@ var uuid = require('node-uuid');
  * @returns {{validate: DecisionModelValidate, create: DecisionModelCreate, insert: DecisionModelInsert, get: DecisionModelGet, find: DecisionModelFind, update: DecisionModelUpdate, remove: DecisionModelRemove}}
  * @constructor
  */
-module.exports = function DecisionModel(config) {
-    var nano = config.nano;
-    var db = nano.use(config.decisionUrl);
+module.exports = function DecisionModel(config, nano) {
+    config = config || {};
+    var myConfig = (config.decision = config.decision || {});
+
+    var db = myConfig.db || (function (myConfig, nano) {
+        nano.db.get(myConfig.dbPath, function(err) {
+            if (err) {
+                nano.db.create(myConfig.dbPath, function(err) {
+                    if (err) throw err
+                });
+            }
+        });
+        return nano.use(myConfig.dbPath);
+    })(myConfig, nano);
 
     var schema = joi.object().keys({
         _id: joi.string().alphanum().default(cloneKey),
@@ -62,13 +73,19 @@ module.exports = function DecisionModel(config) {
         create: function DecisionModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, callback);
+                db.insert(value, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         insert: function DecisionModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, key || value.key, callback);
+                db.insert(value, key || value.key, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         get: function DecisionModelGet(key, callback) {

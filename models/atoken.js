@@ -41,9 +41,20 @@ var uuid = require('node-uuid');
  * @returns {{validate: AccessTokenModelValidate, create: AccessTokenModelCreate, insert: AccessTokenModelInsert, get: AccessTokenModelGet, find: AccessTokenModelFind, update: AccessTokenModelUpdate, remove: AccessTokenModelRemove}}
  * @constructor
  */
-module.exports = function AccessTokenModel(config) {
-    var nano = config.nano;
-    var db = nano.use(config.atokenUrl);
+module.exports = function AccessTokenModel(config, nano) {
+    config = config || {};
+    var myConfig = (config.atoken = config.atoken || {});
+
+    var db = myConfig.db || (function (myConfig, nano) {
+        nano.db.get(myConfig.dbPath, function(err) {
+            if (err) {
+                nano.db.create(myConfig.dbPath, function(err) {
+                    if (err) throw err
+                });
+            }
+        });
+        return nano.use(myConfig.dbPath);
+    })(myConfig, nano);
 
     var schema = joi.object().keys({
         _id: joi.string().alphanum().default(cloneKey),
@@ -64,13 +75,19 @@ module.exports = function AccessTokenModel(config) {
         create: function AccessTokenModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, callback);
+                db.insert(value, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         insert: function AccessTokenModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, key || value.key, callback);
+                db.insert(value, key || value.key, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         get: function AccessTokenModelGet(key, callback) {

@@ -41,9 +41,20 @@ var uuid = require('node-uuid');
  * @returns {{validate: OpenKeyModelValidate, create: OpenKeyModelCreate, insert: OpenKeyModelInsert, get: OpenKeyModelGet, find: OpenKeyModelFind, update: OpenKeyModelUpdate, remove: OpenKeyModelRemove}}
  * @constructor
  */
-module.exports = function OpenKeyModel(config) {
-    var nano = config.nano;
-    var db = nano.use(config.openkeyUrl);
+module.exports = function OpenKeyModel(config, nano) {
+    config = config || {};
+    var myConfig = (config.openkey = config.openkey || {});
+
+    var db = myConfig.db || (function (myConfig, nano) {
+        nano.db.get(myConfig.dbPath, function(err) {
+            if (err) {
+                nano.db.create(myConfig.dbPath, function(err) {
+                    if (err) throw err
+                });
+            }
+        });
+        return nano.use(myConfig.dbPath);
+    })(myConfig, nano);
 
     var schema = joi.object().keys({
         _id: joi.string().alphanum().default(cloneKey),
@@ -61,13 +72,19 @@ module.exports = function OpenKeyModel(config) {
         create: function OpenKeyModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, callback);
+                db.insert(value, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         insert: function OpenKeyModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, key || value.key, callback);
+                db.insert(value, key || value.key, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         get: function OpenKeyModelGet(key, callback) {

@@ -33,21 +33,23 @@
  * *******************************************************************/
 
 module.exports = function AuthModule(config) {
+    config = config || {};
+    config.nano = config.nano || require('nano')('http://localhost:5984');
 
     var exports = {
         events: new events.EventEmitter(),
         models: {
-            acode:      require('./models/acode')(config),
-            atoken:     require('./models/atoken')(config),
-            aukey:      require('./models/aukey')(config),
-            decision:   require('./models/decision')(config),
-            md5key:     require('./models/md5key')(config),
-            openkey:    require('./models/openkey')(config),
-            regRef:     require('./models/regRef')(config),
-            rsa:        require('./models/rsa')(config),
-            salt:       require('./models/salt')(config),
-            secret:     require('./models/secret')(config),
-            userkey:    require('./models/userkey')(config)
+            acode:      require('./models/acode')(config.models, config.nano),
+            atoken:     require('./models/atoken')(config.models, config.nano),
+            aukey:      require('./models/aukey')(config.models, config.nano),
+            decision:   require('./models/decision')(config.models, config.nano),
+            md5key:     require('./models/md5key')(config.models, config.nano),
+            openkey:    require('./models/openkey')(config.models, config.nano),
+            regRef:     require('./models/regRef')(config.models, config.nano),
+            rsa:        require('./models/rsa')(config.models, config.nano),
+            salt:       require('./models/salt')(config.models, config.nano),
+            secret:     require('./models/secret')(config.models, config.nano),
+            userkey:    require('./models/userkey')(config.models, config.nano)
         }
     };
 

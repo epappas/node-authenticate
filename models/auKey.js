@@ -41,9 +41,20 @@ var uuid = require('node-uuid');
  * @returns {{validate: AccessKeyModelValidate, create: AccessKeyModelCreate, insert: AccessKeyModelInsert, get: AccessKeyModelGet, find: AccessKeyModelFind, update: AccessKeyModelUpdate, remove: AccessKeyModelRemove, checkRedirectUri: AccessKeyModelCheckRedirectUri, checkGrantType: AccessKeyModelCheckGrantType, checkScope: AccessKeyModelCheckScope}}
  * @constructor
  */
-module.exports = function AccessKeyModel(config) {
-    var nano = config.nano;
-    var db = nano.use(config.aukeyUrl);
+module.exports = function AccessKeyModel(config, nano) {
+    config = config || {};
+    var myConfig = (config.aukey = config.aukey || {});
+
+    var db = myConfig.db || (function (myConfig, nano) {
+        nano.db.get(myConfig.dbPath, function(err) {
+            if (err) {
+                nano.db.create(myConfig.dbPath, function(err) {
+                    if (err) throw err
+                });
+            }
+        });
+        return nano.use(myConfig.dbPath);
+    })(myConfig, nano);
 
     var schema = joi.object().keys({
         _id: joi.string().alphanum().default(cloneKey),
@@ -62,13 +73,19 @@ module.exports = function AccessKeyModel(config) {
         create: function AccessKeyModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, callback);
+                db.insert(value, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         insert: function AccessKeyModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, key || value.key, callback);
+                db.insert(value, key || value.key, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         get: function AccessKeyModelGet(key, callback) {

@@ -41,9 +41,20 @@ var uuid = require('node-uuid');
  * @returns {{validate: AccessCodeModelValidate, create: AccessCodeModelCreate, insert: AccessCodeModelInsert, get: AccessCodeModelGet, find: AccessCodeModelFind, update: AccessCodeModelUpdate, remove: AccessCodeModelRemove}}
  * @constructor
  */
-module.exports = function AccessCodeModel(config) {
-    var nano = config.nano;
-    var db = nano.use(config.acodeUrl);
+module.exports = function AccessCodeModel(config, nano) {
+    config = config || {};
+    var myConfig = (config.acode = config.acode || {});
+
+    var db = myConfig.db || (function (myConfig, nano) {
+        nano.db.get(myConfig.dbPath, function(err) {
+            if (err) {
+                nano.db.create(myConfig.dbPath, function(err) {
+                    if (err) throw err
+                });
+            }
+        });
+        return nano.use(myConfig.dbPath);
+    })(myConfig, nano);
 
     var schema = joi.object().keys({
         _id: joi.string().alphanum().default(cloneKey),
@@ -65,13 +76,19 @@ module.exports = function AccessCodeModel(config) {
         create: function AccessCodeModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, callback);
+                db.insert(value, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         insert: function AccessCodeModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, key || value.key, callback);
+                db.insert(value, key || value.key, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         get: function AccessCodeModelGet(key, callback) {

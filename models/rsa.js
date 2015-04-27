@@ -41,9 +41,20 @@ var uuid = require('node-uuid');
  * @returns {{validate: RSAModelValidate, create: RSAModelCreate, insert: RSAModelInsert, get: RSAModelGet, find: RSAModelFind, update: RSAModelUpdate, remove: RSAModelRemove}}
  * @constructor
  */
-module.exports = function RSAModel(config) {
-    var nano = config.nano;
-    var db = nano.use(config.rsaUrl);
+module.exports = function RSAModel(config, nano) {
+    config = config || {};
+    var myConfig = (config.rsa = config.rsa || {});
+
+    var db = myConfig.db || (function (myConfig, nano) {
+        nano.db.get(myConfig.dbPath, function(err) {
+            if (err) {
+                nano.db.create(myConfig.dbPath, function(err) {
+                    if (err) throw err
+                });
+            }
+        });
+        return nano.use(myConfig.dbPath);
+    })(myConfig, nano);
 
     var bits = 4096;
 
@@ -62,13 +73,19 @@ module.exports = function RSAModel(config) {
         create: function RSAModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, callback);
+                db.insert(value, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         insert: function RSAModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, key || value.key, callback);
+                db.insert(value, key || value.key, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         get: function RSAModelGet(key, callback) {

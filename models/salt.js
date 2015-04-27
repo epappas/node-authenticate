@@ -41,9 +41,20 @@ var uuid = require('node-uuid');
  * @returns {{validate: SaltModelValidate, create: SaltModelCreate, insert: SaltModelInsert, get: SaltModelGet, find: SaltModelFind, update: SaltModelUpdate, remove: SaltModelRemove}}
  * @constructor
  */
-module.exports = function SaltModel(config) {
-    var nano = config.nano;
-    var db = nano.use(config.saltUrl);
+module.exports = function SaltModel(config, nano) {
+    config = config || {};
+    var myConfig = (config.salt = config.salt || {});
+
+    var db = myConfig.db || (function (myConfig, nano) {
+        nano.db.get(myConfig.dbPath, function(err) {
+            if (err) {
+                nano.db.create(myConfig.dbPath, function(err) {
+                    if (err) throw err
+                });
+            }
+        });
+        return nano.use(myConfig.dbPath);
+    })(myConfig, nano);
 
     var schema = joi.object().keys({
         _id: joi.string().alphanum().default(cloneKey),
@@ -59,13 +70,19 @@ module.exports = function SaltModel(config) {
         create: function SaltModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, callback);
+                db.insert(value, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         insert: function SaltModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, key || value.key, callback);
+                db.insert(value, key || value.key, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         get: function SaltModelGet(key, callback) {

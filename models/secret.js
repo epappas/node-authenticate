@@ -41,9 +41,20 @@ var bcrypt = require('bcrypt');
  * @returns {{validate: SecretModelValidate, create: SecretModelCreate, insert: SecretModelInsert, get: SecretModelGet, find: SecretModelFind, update: SecretModelUpdate, remove: SecretModelRemove, checkSecret: SecretModelcheckSecret}}
  * @constructor
  */
-module.exports = function SecretModel(config) {
-    var nano = config.nano;
-    var db = nano.use(config.secretUrl);
+module.exports = function SecretModel(config, nano) {
+    config = config || {};
+    var myConfig = (config.secret = config.secret || {});
+
+    var db = myConfig.db || (function (myConfig, nano) {
+        nano.db.get(myConfig.dbPath, function(err) {
+            if (err) {
+                nano.db.create(myConfig.dbPath, function(err) {
+                    if (err) throw err
+                });
+            }
+        });
+        return nano.use(myConfig.dbPath);
+    })(myConfig, nano);
 
     var schema = joi.object().keys({
         _id: joi.string().alphanum().default(cloneKey),
@@ -78,13 +89,19 @@ module.exports = function SecretModel(config) {
         create: function SecretModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, callback);
+                db.insert(value, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         insert: function SecretModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, key || value.key, callback);
+                db.insert(value, key || value.key, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         get: function SecretModelGet(key, callback) {

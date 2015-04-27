@@ -41,9 +41,20 @@ var uuid = require('node-uuid');
  * @returns {{validate: UserKeyModelValidate, create: UserKeyModelCreate, insert: UserKeyModelInsert, get: UserKeyModelGet, find: UserKeyModelFind, update: UserKeyModelUpdate, remove: UserKeyModelRemove}}
  * @constructor
  */
-module.exports = function UserKeyModel(config) {
-    var nano = config.nano;
-    var db = nano.use(config.userkeyUrl);
+module.exports = function UserKeyModel(config, nano) {
+    config = config || {};
+    var myConfig = (config.userkey = config.userkey || {});
+
+    var db = myConfig.db || (function (myConfig, nano) {
+        nano.db.get(myConfig.dbPath, function(err) {
+            if (err) {
+                nano.db.create(myConfig.dbPath, function(err) {
+                    if (err) throw err
+                });
+            }
+        });
+        return nano.use(myConfig.dbPath);
+    })(myConfig, nano);
 
     var schema = joi.object().keys({
         _id: joi.string().alphanum().default(cloneKey),
@@ -61,13 +72,19 @@ module.exports = function UserKeyModel(config) {
         create: function UserKeyModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, callback);
+                db.insert(value, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         insert: function UserKeyModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, key || value.key, callback);
+                db.insert(value, key || value.key, function (err, body, headers) {
+                    if (err) return callback(err);
+                    callback(null, body);
+                });
             });
         },
         get: function UserKeyModelGet(key, callback) {
