@@ -1,6 +1,6 @@
 {
   "name": "node-authenticate",
-  "version": "0.0.1-alpha",
+  "version": "0.0.2-alpha",
   "description": "a security sophisticated module for oauth2 & registration flow",
   "author": "Evangelos Pappas <epappas@evalonlabs.com>",
   "engine": "node >= 0.10.x",
