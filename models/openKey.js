@@ -72,7 +72,11 @@ module.exports = function OpenKeyModel(config, nano) {
         create: function OpenKeyModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
-                db.insert(value, function (err, body, headers) {
+                var inserCall = value.key ?
+                    db.insert.bind(db, value, value.key) :
+                    db.insert.bind(db, value);
+
+                inserCall(function (err, body, headers) {
                     if (err) return callback(err);
                     callback(null, body);
                 });
