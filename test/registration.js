@@ -19,6 +19,7 @@ var authenticate = require('../index')({
 describe('Registration', function () {
     var registration = new authenticate.registration();
     var regEmail = 'test_{{rand}}@example.com'.replace('{{rand}}', Math.random().toString(16).slice(2));
+    var regRef;
 
     it('Should Create a user account', function (done) {
         registration.register(regEmail, function (err, result) {
@@ -26,7 +27,7 @@ describe('Registration', function () {
 
             should.exist(result);
 
-            var regResp = joi.object().keys({
+            var regRespSchema = joi.object().keys({
                 _id: joi.string(),
                 _rev: joi.string(),
                 relkey: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
@@ -46,9 +47,37 @@ describe('Registration', function () {
                 }
             });
 
-            regResp.validate(result, function(err, result) {
+            regRespSchema.validate(result, function (err, result) {
                 should(err).be.empty;
                 should.exist(result);
+                regRef = result;
+                done();
+            });
+        });
+    });
+
+    it('Should get the created registration state', function (done) {
+
+        registration.get(regRef.key, function (err, regState) {
+            should(err).be.empty;
+
+            should.exist(regState);
+
+            var regRespSchema = joi.object().keys({
+                _id: joi.string(),
+                _rev: joi.string(),
+                email: joi.string().email().required(),
+                token: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                salt: joi.string().required(),
+                relkey: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                expires: joi.number().required(),
+                scope: joi.array().items(joi.string()).required()
+            });
+
+            regRespSchema.validate(regState, function (err, regState) {
+                should(err).be.empty;
+                should.exist(regState);
+                regRef = regState;
                 done();
             });
         });
