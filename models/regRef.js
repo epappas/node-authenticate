@@ -57,12 +57,12 @@ module.exports = function RegRefModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey, '_id'),
-        key: joi.string().alphanum().default(generateUuid, 'key'),
-        relkey: joi.string().alphanum(),
+        _id: joi.string().default(cloneKey, '_id'),
+        key: joi.string().default(generateUuid, 'key'),
+        relkey: joi.string(),
         state:  joi.any().default({}),
         expires: joi.number().default(generateExpiration, 'expires'),
-        scope: [joi.string().alphanum()],
+        scope: joi.array().items(joi.string()),
         created: joi.number().default(Date.now, 'created')
     });
 
@@ -89,7 +89,10 @@ module.exports = function RegRefModel(config, nano) {
             });
         },
         get: function RegRefModelGet(key, callback) {
-            callback();
+            db.get(key, function(err, body, headers) {
+                if (err) return callback(err);
+                callback(null, body);
+            });
         },
         find: function RegRefModelFind(query, callback) {
             callback();

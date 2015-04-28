@@ -59,8 +59,8 @@ module.exports = function RSAModel(config, nano) {
     var bits = 4096;
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey, '_id'),
-        key: joi.string().alphanum(),
+        _id: joi.string().default(cloneKey, '_id'),
+        key: joi.string(),
         rsaPrivKey: joi.string().default(generateKey, 'rsaPrivKey'),
         rsaBits: joi.string().default(bits, 'rsaBits'),
         created: joi.number().default(Date.now, 'created')
@@ -89,7 +89,10 @@ module.exports = function RSAModel(config, nano) {
             });
         },
         get: function RSAModelGet(key, callback) {
-            callback();
+            db.get(key, function(err, body, headers) {
+                if (err) return callback(err);
+                callback(null, body);
+            });
         },
         find: function RSAModelFind(query, callback) {
             callback();

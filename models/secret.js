@@ -58,8 +58,8 @@ module.exports = function SecretModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey, '_id'),
-        key: joi.string().alphanum(),
+        _id: joi.string().default(cloneKey, '_id'),
+        key: joi.string(),
         srpsalt: joi.string().default(generateSalt, 'srpsalt'),
         verifier: joi.string(),
         password: joi.string(),
@@ -109,7 +109,10 @@ module.exports = function SecretModel(config, nano) {
             });
         },
         get: function SecretModelGet(key, callback) {
-            callback();
+            db.get(key, function(err, body, headers) {
+                if (err) return callback(err);
+                callback(null, body);
+            });
         },
         find: function SecretModelFind(query, callback) {
             callback();

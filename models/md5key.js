@@ -57,10 +57,11 @@ module.exports = function Md5KeyModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey),
-        ukey: joi.string().alphanum(),
-        key: joi.string().alphanum(),
-        created: joi.number().default(Date.now)
+        _id: joi.string().default(cloneKey, '_id'),
+        ukey: joi.string(),
+        key: joi.string(),
+        email: joi.string().email(),
+        created: joi.number().default(Date.now, 'created')
     });
 
     return {
@@ -90,7 +91,10 @@ module.exports = function Md5KeyModel(config, nano) {
             });
         },
         get: function Md5KeyModelGet(key, callback) {
-            callback();
+            db.get(key, function(err, body, headers) {
+                if (err) return callback(err);
+                callback(null, body);
+            });
         },
         find: function Md5KeyModelFind(query, callback) {
             callback();

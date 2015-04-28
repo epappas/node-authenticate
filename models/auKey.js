@@ -57,12 +57,12 @@ module.exports = function AccessKeyModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey, '_id'),
-        key: joi.string().alphanum().default(generateUuid, 'key'),
-        openkey: joi.string().alphanum(),
-        scope: [joi.string()],
-        grantTypeList: [joi.string()],
-        uriList: [joi.any()],
+        _id: joi.string().default(cloneKey, '_id'),
+        key: joi.string().default(generateUuid, 'key'),
+        openkey: joi.string(),
+        scope: joi.array().items(joi.string()),
+        grantTypeList: joi.array().items(joi.string()),
+        uriList: joi.array().items(joi.any()),
         created: joi.number().default(Date.now, 'created')
     });
 
@@ -89,7 +89,10 @@ module.exports = function AccessKeyModel(config, nano) {
             });
         },
         get: function AccessKeyModelGet(key, callback) {
-            callback();
+            db.get(key, function(err, body, headers) {
+                if (err) return callback(err);
+                callback(null, body);
+            });
         },
         find: function AccessKeyModelFind(query, callback) {
             callback();

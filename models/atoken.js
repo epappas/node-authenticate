@@ -57,14 +57,14 @@ module.exports = function AccessTokenModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey, '_id'),
-        key: joi.string().alphanum().default(generateUuid, 'key'),
-        salt: joi.string().alphanum().default(generateSalt, 'salt'),
-        relkey: joi.string().alphanum(),
+        _id: joi.string().default(cloneKey, '_id'),
+        key: joi.string().default(generateUuid, 'key'),
+        salt: joi.string().default(generateSalt, 'salt'),
+        relkey: joi.string(),
         expires: joi.number().default(generateExpiration, 'expires'),
-        scope: [joi.string()],
-        grantTypeList: [joi.string()],
-        redirectUri: [joi.string()],
+        scope: joi.array().items(joi.string()),
+        grantTypeList: joi.array().items(joi.string()),
+        redirectUri: joi.array().items(joi.any()),
         created: joi.number().default(Date.now, 'created')
     });
 
@@ -91,7 +91,10 @@ module.exports = function AccessTokenModel(config, nano) {
             });
         },
         get: function AccessTokenModelGet(key, callback) {
-            callback();
+            db.get(key, function(err, body, headers) {
+                if (err) return callback(err);
+                callback(null, body);
+            });
         },
         find: function AccessTokenModelFind(query, callback) {
             callback();

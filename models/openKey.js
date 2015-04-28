@@ -57,11 +57,11 @@ module.exports = function OpenKeyModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey, '_id'),
-        key: joi.string().alphanum().default(generateUuid, 'key'),
-        ukey: joi.string().alphanum(),
-        scope: [joi.string()],
-        grantTypeList: [joi.string()],
+        _id: joi.string().default(cloneKey, '_id'),
+        key: joi.string().default(generateUuid, 'key'),
+        ukey: joi.string(),
+        scope: joi.array().items(joi.string()),
+        grantTypeList: joi.array().items(joi.string()),
         created: joi.number().default(Date.now, 'created')
     });
 
@@ -88,7 +88,10 @@ module.exports = function OpenKeyModel(config, nano) {
             });
         },
         get: function OpenKeyModelGet(key, callback) {
-            callback();
+            db.get(key, function(err, body, headers) {
+                if (err) return callback(err);
+                callback(null, body);
+            });
         },
         find: function OpenKeyModelFind(query, callback) {
             callback();

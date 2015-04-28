@@ -57,11 +57,11 @@ module.exports = function UserKeyModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey, '_id'),
-        key: joi.string().alphanum().default(generateUuid, 'key'),
+        _id: joi.string().default(cloneKey, '_id'),
+        key: joi.string().default(generateUuid, 'key'),
         email: joi.string().email(),
-        alias: [joi.string().email()],
-        grantTypeList: [joi.string()],
+        alias: joi.array().items(joi.string().email()),
+        grantTypeList: joi.array().items(joi.string()),
         created: joi.number().default(Date.now, 'created')
     });
 
@@ -88,7 +88,10 @@ module.exports = function UserKeyModel(config, nano) {
             });
         },
         get: function UserKeyModelGet(key, callback) {
-            callback();
+            db.get(key, function(err, body, headers) {
+                if (err) return callback(err);
+                callback(null, body);
+            });
         },
         find: function UserKeyModelFind(query, callback) {
             callback();

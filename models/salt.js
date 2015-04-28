@@ -57,9 +57,9 @@ module.exports = function SaltModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey, '_id'),
-        key: joi.string().alphanum(),
-        salt: joi.string().alphanum().default(generateSalt, 'salt'),
+        _id: joi.string().default(cloneKey, '_id'),
+        key: joi.string(),
+        salt: joi.string().default(generateSalt, 'salt'),
         created: joi.number().default(Date.now, 'created')
     });
 
@@ -86,7 +86,10 @@ module.exports = function SaltModel(config, nano) {
             });
         },
         get: function SaltModelGet(key, callback) {
-            callback();
+            db.get(key, function(err, body, headers) {
+                if (err) return callback(err);
+                callback(null, body);
+            });
         },
         find: function SaltModelFind(query, callback) {
             callback();

@@ -57,12 +57,12 @@ module.exports = function DecisionModel(config, nano) {
     })(myConfig, nano);
 
     var schema = joi.object().keys({
-        _id: joi.string().alphanum().default(cloneKey, '_id'),
-        key: joi.string().alphanum().default(generateUuid, 'key'),
+        _id: joi.string().default(cloneKey, '_id'),
+        key: joi.string().default(generateUuid, 'key'),
         redirectUri: joi.string().uri(),
         html: joi.string().default(generateHtml, 'html'),
         expires: joi.number().default(generateExpiration, 'expires'),
-        scope: [joi.string()],
+        scope: joi.array().items(joi.string()),
         created: joi.number().default(Date.now, 'created')
     });
 
@@ -89,7 +89,10 @@ module.exports = function DecisionModel(config, nano) {
             });
         },
         get: function DecisionModelGet(key, callback) {
-            callback();
+            db.get(key, function(err, body, headers) {
+                if (err) return callback(err);
+                callback(null, body);
+            });
         },
         find: function DecisionModelFind(query, callback) {
             callback();
