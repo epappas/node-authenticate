@@ -18,6 +18,7 @@ var authenticate = require('../index')({
 
 describe('Registration', function () {
     var registration = new authenticate.registration();
+
     var regEmail = 'test_{{rand}}@example.com'.replace('{{rand}}', Math.random().toString(16).slice(2));
     var regRef;
 

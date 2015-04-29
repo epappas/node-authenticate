@@ -38,7 +38,7 @@ var uuid = require('node-uuid');
 /**
  *
  * @param config
- * @returns {{validate: AccessTokenModelValidate, create: AccessTokenModelCreate, insert: AccessTokenModelInsert, get: AccessTokenModelGet, find: AccessTokenModelFind, update: AccessTokenModelUpdate, remove: AccessTokenModelRemove}}
+ * @returns {{validate: AccessTokenModelValidate, create: AccessTokenModelCreate, insert: AccessTokenModelInsert, get: AccessTokenModelGet, find: AccessTokenModelFind, update: AccessTokenModelUpdate, remove: AccessTokenModelRemove, checkScope: AccessTokenModelCheckScope}}
  * @constructor
  */
 module.exports = function AccessTokenModel(config, nano) {
@@ -108,6 +108,9 @@ module.exports = function AccessTokenModel(config, nano) {
         },
         remove: function AccessTokenModelRemove(key, callback) {
             callback();
+        },
+        checkScope: function AccessTokenModelCheckScope(atoken, scope, callback) {
+            callback(null, true);
         }
     };
 
