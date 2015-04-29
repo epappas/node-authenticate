@@ -78,7 +78,41 @@ describe('Registration', function () {
             regRespSchema.validate(regState, function (err, regState) {
                 should(err).be.empty;
                 should.exist(regState);
-                regRef = regState;
+
+                tokenState = regState;
+
+                done();
+            });
+        });
+    });
+
+    it('Should validate the fetched token', function (done) {
+        authenticate.validation({
+            accessToken: tokenState.token,
+            accessKey: tokenState.relkey,
+            scope: tokenState.scope,
+            expiration: tokenState.expires
+        }, function (err, atoken) {
+            should(err).be.empty;
+
+            should.exist(atoken);
+
+            var atokenSchema = joi.object().keys({
+                _id: joi.string(),
+                _rev: joi.string(),
+                key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                salt: joi.string().required(),
+                relkey: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                expires: joi.number().required(),
+                created: joi.number().required(),
+                scope: joi.array().items(joi.string()).required(),
+                aukey: joi.any()
+            });
+
+            atokenSchema.validate(atoken, function (err, atoken) {
+                should(err).be.empty;
+                should.exist(atoken);
+
                 done();
             });
         });
