@@ -89,9 +89,8 @@ describe('Registration', function () {
     it('Should validate the fetched token', function (done) {
         authenticate.validation({
             accessToken: tokenState.token,
-            accessKey: tokenState.relkey,
-            scope: tokenState.scope,
-            expiration: tokenState.expires
+            uniqueKey: tokenState.relkey,
+            scope: tokenState.scope
         }, function (err, atoken) {
             should(err).be.empty;
 
@@ -102,11 +101,11 @@ describe('Registration', function () {
                 _rev: joi.string(),
                 key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
                 salt: joi.string().required(),
+                uniqueKey: joi.string().required(),
                 relkey: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
                 expires: joi.number().required(),
                 created: joi.number().required(),
-                scope: joi.array().items(joi.string()).required(),
-                aukey: joi.any()
+                scope: joi.array().items(joi.string()).required()
             });
 
             atokenSchema.validate(atoken, function (err, atoken) {
