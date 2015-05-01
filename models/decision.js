@@ -63,6 +63,7 @@ module.exports = function DecisionModel(config, nano) {
         html: joi.string().default(generateHtml, 'html'),
         expires: joi.number().default(generateExpiration, 'expires'),
         scope: joi.array().items(joi.string()),
+        state: joi.any(),
         created: joi.number().default(Date.now, 'created')
     });
 

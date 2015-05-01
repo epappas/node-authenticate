@@ -128,7 +128,7 @@ module.exports = function SecretModel(config, nano) {
             callback();
         },
         checkSecret: function SecretModelcheckSecret(key, secretVal, callback) {
-            callback();
+            callback(null, true);
         }
     };
 

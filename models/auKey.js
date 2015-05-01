@@ -108,13 +108,13 @@ module.exports = function AccessKeyModel(config, nano) {
             callback();
         },
         checkRedirectUri: function AccessKeyModelCheckRedirectUri(aukey, redirectUri, callback) {
-            callback();
+            callback(null, true);
         },
         checkGrantType: function AccessKeyModelCheckGrantType(aukey, grantType, callback) {
-            callback();
+            callback(null, true);
         },
         checkScope: function AccessKeyModelCheckScope(aukey, scope, callback) {
-            callback();
+            callback(null, true);
         }
     };
 
