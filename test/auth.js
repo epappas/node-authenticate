@@ -53,9 +53,43 @@ describe('Auth AUKEY', function () {
         });
     });
 
-    it('Should authenticate and respond with access code', function (done) {
+    it('Should respond with decision form', function (done) {
         auth.authenticate({
             method: 'GET',
+            redirectUri: '/',
+            apiKey: aukeyState.key,
+            secret: secretState.verifier,
+            responseType: 'code', // or token
+            scope: tokenState.scope,
+            state: {test: 1234},
+            decision: true
+        }, function (err, decision) {
+            should(err).be.empty;
+            should.exist(decision);
+
+            var decisionSchema = joi.object().keys({
+                _id: joi.string(),
+                _rev: joi.string(),
+                key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                scope: joi.array().items(joi.string()).required(),
+                html: joi.string().required(),
+                state: joi.any(),
+                expires: joi.number().required(),
+                created: joi.number().required()
+            });
+
+            decisionSchema.validate(decision, function (err, decision) {
+                should(err).be.empty;
+                should.exist(decision);
+
+                done();
+            });
+        });
+    });
+
+    it('Should authenticate and respond with access code', function (done) {
+        auth.authenticate({
+            method: 'POST',
             redirectUri: '/',
             apiKey: aukeyState.key,
             secret: secretState.verifier,
@@ -67,15 +101,29 @@ describe('Auth AUKEY', function () {
             should(err).be.empty;
             should.exist(acode);
 
-            console.log(err, acode);
+            var acodeSchema = joi.object().keys({
+                _id: joi.string(),
+                _rev: joi.string(),
+                key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                scope: joi.array().items(joi.string()).required(),
+                code: joi.string().required(),
+                state: joi.any(),
+                expires: joi.number().required(),
+                created: joi.number().required()
+            });
 
-            done();
+            acodeSchema.validate(acode, function (err, acode) {
+                should(err).be.empty;
+                should.exist(acode);
+
+                done();
+            });
         });
     });
 
     it('Should authenticate and respond with access token', function (done) {
         auth.authenticate({
-            method: 'GET',
+            method: 'POST',
             redirectUri: '/',
             apiKey: aukeyState.key,
             secret: secretState.verifier,
@@ -87,9 +135,26 @@ describe('Auth AUKEY', function () {
             should(err).be.empty;
             should.exist(atoken);
 
-            console.log(err, atoken);
+            var atokenSchema = joi.object().keys({
+                _id: joi.string(),
+                _rev: joi.string(),
+                key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                scope: joi.array().items(joi.string()).required(),
+                relkey: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                uniqueKey: joi.string().required(),
+                grantTypeList: joi.array().items(joi.string()),
+                salt: joi.string(),
+                state: joi.any(),
+                expires: joi.number().required(),
+                created: joi.number().required()
+            });
 
-            done();
+            atokenSchema.validate(atoken, function (err, atoken) {
+                should(err).be.empty;
+                should.exist(atoken);
+
+                done();
+            });
         });
     });
 });
