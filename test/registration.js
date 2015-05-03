@@ -23,7 +23,7 @@ describe('Registration', function () {
     var regRef;
 
     it('Should Create a user account', function (done) {
-        registration.register(regEmail, function (err, result) {
+        registration.registerUser(regEmail, function (err, result) {
             should(err).be.empty;
 
             should.exist(result);
