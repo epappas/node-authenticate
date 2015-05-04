@@ -41,17 +41,20 @@ module.exports = function AuthModule(config) {
     var exports = {
         events: new events.EventEmitter(),
         models: {
-            acode:      require('./models/acode')(config.models, config.nano),
-            atoken:     require('./models/atoken')(config.models, config.nano),
-            aukey:      require('./models/aukey')(config.models, config.nano),
-            decision:   require('./models/decision')(config.models, config.nano),
-            md5key:     require('./models/md5key')(config.models, config.nano),
-            openkey:    require('./models/openkey')(config.models, config.nano),
-            regref:     require('./models/regref')(config.models, config.nano),
-            rsa:        require('./models/rsa')(config.models, config.nano),
-            salt:       require('./models/salt')(config.models, config.nano),
-            secret:     require('./models/secret')(config.models, config.nano),
-            userkey:    require('./models/userkey')(config.models, config.nano)
+            acode:          require('./models/acode')(config.models, config.nano),
+            atoken:         require('./models/atoken')(config.models, config.nano),
+            aukey:          require('./models/aukey')(config.models, config.nano),
+            decision:       require('./models/decision')(config.models, config.nano),
+            md5key:         require('./models/md5key')(config.models, config.nano),
+            openkey:        require('./models/openkey')(config.models, config.nano),
+            regref:         require('./models/regref')(config.models, config.nano),
+            rsa:            require('./models/rsa')(config.models, config.nano),
+            salt:           require('./models/salt')(config.models, config.nano),
+            secret:         require('./models/secret')(config.models, config.nano),
+            userkey:        require('./models/userkey')(config.models, config.nano),
+            platform:       require('./models/platform')(config.models, config.nano),
+            domain:         require('./models/domain')(config.models, config.nano),
+            domainstate:    require('./models/domainstate')(config.models, config.nano)
         }
     };
 
