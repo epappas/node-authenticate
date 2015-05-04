@@ -60,6 +60,7 @@ module.exports = function OpenKeyModel(config, nano) {
         _id: joi.string().default(cloneKey, '_id'),
         key: joi.string().default(generateUuid, 'key'),
         ukey: joi.string(),
+        relkey: joi.string().default('0'), // 0th is the web platform
         scope: joi.array().items(joi.string()),
         grantTypeList: joi.array().items(joi.string()),
         created: joi.number().default(Date.now, 'created')
