@@ -59,7 +59,7 @@ module.exports = function AccessKeyModel(config, nano) {
     var schema = joi.object().keys({
         _id: joi.string().default(cloneKey, '_id'),
         key: joi.string().default(generateUuid, 'key'),
-        openkey: joi.string(),
+        relkey: joi.string(),
         scope: joi.array().items(joi.string()),
         grantTypeList: joi.array().items(joi.string()),
         uriList: joi.array().items(joi.any()),
