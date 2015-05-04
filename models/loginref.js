@@ -38,12 +38,12 @@ var uuid = require('node-uuid');
 /**
  *
  * @param config
- * @returns {{validate: RegRefModelValidate, create: RegRefModelCreate, insert: RegRefModelInsert, get: RegRefModelGet, find: RegRefModelFind, update: RegRefModelUpdate, remove: RegRefModelRemove}}
+ * @returns {{validate: LoginRefModelValidate, create: LoginRefModelCreate, insert: LoginRefModelInsert, get: LoginRefModelGet, find: LoginRefModelFind, update: LoginRefModelUpdate, remove: LoginRefModelRemove}}
  * @constructor
  */
-module.exports = function RegRefModel(config, nano) {
+module.exports = function LoginRefModel(config, nano) {
     config = config || {};
-    var myConfig = (config.regref = config.regref || {});
+    var myConfig = (config.loginref = config.loginref || {});
 
     var db = myConfig.db || (function (myConfig, nano) {
         nano.db.get(myConfig.dbPath, function(err) {
@@ -60,18 +60,18 @@ module.exports = function RegRefModel(config, nano) {
         _id: joi.string().default(cloneKey, '_id'),
         key: joi.string().default(generateUuid, 'key'),
         relkey: joi.string(),
-        state:  joi.any().default({}),
+        state: joi.any().default({}),
         status: joi.string().valid('pending', 'fulfilled', 'paused', 'error', 'expired', 'cancelled').default('pending'),
+        salt: joi.string().default(generateSalt, 'salt'),
         expires: joi.number().default(generateExpiration, 'expires'),
-        scope: joi.array().items(joi.string()),
         created: joi.number().default(Date.now, 'created')
     });
 
     return {
-        validate: function RegRefModelValidate(value, callback) {
+        validate: function LoginRefModelValidate(value, callback) {
             joi.validate(value, schema, callback);
         },
-        create: function RegRefModelCreate(value, callback) {
+        create: function LoginRefModelCreate(value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
                 var inserCall = value.key ?
@@ -84,7 +84,7 @@ module.exports = function RegRefModel(config, nano) {
                 });
             });
         },
-        insert: function RegRefModelInsert(key, value, callback) {
+        insert: function LoginRefModelInsert(key, value, callback) {
             this.validate(value, function (err, value) {
                 if (err) return callback(err);
                 db.insert(value, key || value.key, function (err, body, headers) {
@@ -93,19 +93,19 @@ module.exports = function RegRefModel(config, nano) {
                 });
             });
         },
-        get: function RegRefModelGet(key, callback) {
+        get: function LoginRefModelGet(key, callback) {
             db.get(key, function(err, body, headers) {
                 if (err) return callback(err);
                 callback(null, body);
             });
         },
-        find: function RegRefModelFind(query, callback) {
+        find: function LoginRefModelFind(query, callback) {
             callback();
         },
-        update: function RegRefModelUpdate(key, value, callback) {
+        update: function LoginRefModelUpdate(key, value, callback) {
             callback();
         },
-        remove: function RegRefModelRemove(key, callback) {
+        remove: function LoginRefModelRemove(key, callback) {
             callback();
         }
     };
@@ -118,7 +118,11 @@ module.exports = function RegRefModel(config, nano) {
         return uuid.v4(uuid.v1());
     }
 
+    function generateSalt() {
+        return new Buffer(uuid.v4(uuid.v1())).toString('base64');
+    }
+
     function generateExpiration() {
-        return Date.now() + (60 * 60 * 24 * 1000); // 1 day
+        return Date.now() + (60 * 60 * 1000); // 1 hour
     }
 };

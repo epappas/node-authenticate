@@ -23,6 +23,7 @@ describe('Auth AUKEY', function () {
     var tokenState;
     var aukeyState;
     var secretState;
+    var userSession;
 
     before(function(done) {
         registration.newUser(regEmail, function (err, result) {
@@ -39,6 +40,7 @@ describe('Auth AUKEY', function () {
                     should.exist(aukey);
 
                     aukeyState = aukey;
+                    userSession = aukey;
 
                     authenticate.models.secret.get(aukey.key, function (err, secret) {
                         should(err).be.empty;
@@ -62,6 +64,7 @@ describe('Auth AUKEY', function () {
             responseType: 'code', // or token
             scope: tokenState.scope,
             state: {test: 1234},
+            userSession: userSession,
             decision: true
         }, function (err, decision) {
             should(err).be.empty;
@@ -96,6 +99,7 @@ describe('Auth AUKEY', function () {
             responseType: 'code', // or token
             scope: tokenState.scope,
             state: {test: 1234},
+            userSession: userSession,
             decision: true
         }, function (err, acode) {
             should(err).be.empty;
@@ -130,6 +134,7 @@ describe('Auth AUKEY', function () {
             responseType: 'token', // or token
             scope: tokenState.scope,
             state: {test: 1234},
+            userSession: userSession,
             decision: true
         }, function (err, atoken) {
             should(err).be.empty;

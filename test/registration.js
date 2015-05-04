@@ -36,6 +36,7 @@ describe('Registration', function () {
                 scope: joi.array().items(joi.string()).required(),
                 expires: joi.number().required(),
                 created: joi.number().required(),
+                status: joi.string().valid('pending', 'fulfilled', 'paused', 'error', 'expired', 'cancelled'),
                 state: {
                     _id: joi.string(),
                     _rev: joi.string(),
