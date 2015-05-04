@@ -25,7 +25,7 @@ describe('Auth AUKEY', function () {
     var secretState;
 
     before(function(done) {
-        registration.registerUser(regEmail, function (err, result) {
+        registration.newUser(regEmail, function (err, result) {
             should(err).be.empty;
             should.exist(result);
 
