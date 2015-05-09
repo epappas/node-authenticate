@@ -207,6 +207,30 @@ describe('B2B Client', function () {
         });
     });
 
+    it('Should have valid aukey rsa', function (done) {
+        authenticate.models.rsa.get(myAukey.key, function (err, rsa) {
+            should(err).be.empty;
+
+            should.exist(rsa);
+
+            var rsaSchema = joi.object().keys({
+                _id: joi.string(),
+                _rev: joi.string(),
+                key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                rsaPrivKey: joi.string().allow(''),
+                rsaBits: joi.any().required(),
+                created: joi.number().required()
+            });
+
+            rsaSchema.validate(rsa, function (err, rsa) {
+                should(err).be.empty;
+                should.exist(rsa);
+
+                done();
+            });
+        });
+    });
+
     it('Should have valid openkey', function (done) {
         authenticate.models.openkey.get(myAukey.relkey, function (err, openkey) {
             should(err).be.empty;
@@ -260,6 +284,30 @@ describe('B2B Client', function () {
         });
     });
 
+    it('Should have valid openkey rsa', function (done) {
+        authenticate.models.rsa.get(myOpenkey.key, function (err, rsa) {
+            should(err).be.empty;
+
+            should.exist(rsa);
+
+            var rsaSchema = joi.object().keys({
+                _id: joi.string(),
+                _rev: joi.string(),
+                key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                rsaPrivKey: joi.string().allow(''),
+                rsaBits: joi.any().required(),
+                created: joi.number().required()
+            });
+
+            rsaSchema.validate(rsa, function (err, rsa) {
+                should(err).be.empty;
+                should.exist(rsa);
+
+                done();
+            });
+        });
+    });
+
     it('Should have valid userkey', function (done) {
         authenticate.models.userkey.get(myOpenkey.ukey, function (err, userkey) {
             should(err).be.empty;
@@ -306,6 +354,30 @@ describe('B2B Client', function () {
                 should.exist(userkeySecret);
 
                 myUserkeySecret = userkeySecret;
+
+                done();
+            });
+        });
+    });
+
+    it('Should have valid userkey rsa', function (done) {
+        authenticate.models.rsa.get(myUserkey.key, function (err, rsa) {
+            should(err).be.empty;
+
+            should.exist(rsa);
+
+            var rsaSchema = joi.object().keys({
+                _id: joi.string(),
+                _rev: joi.string(),
+                key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                rsaPrivKey: joi.string().allow(''),
+                rsaBits: joi.any().required(),
+                created: joi.number().required()
+            });
+
+            rsaSchema.validate(rsa, function (err, rsa) {
+                should(err).be.empty;
+                should.exist(rsa);
 
                 done();
             });
