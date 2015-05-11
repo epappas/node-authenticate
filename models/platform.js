@@ -65,7 +65,7 @@ module.exports = function PlatformModel(config, nano) {
         callback: joi.string(),
         name: joi.string(),
         version: joi.string(),
-        salt: joi.string(),
+        salt: joi.string().default(generateSalt, 'salt'),
         created: joi.number().default(Date.now, 'created')
     });
 
@@ -117,6 +117,10 @@ module.exports = function PlatformModel(config, nano) {
     }
 
     function generateUuid() {
+        return uuid.v4(uuid.v1());
+    }
+
+    function generateSalt() {
         return uuid.v4(uuid.v1());
     }
 };

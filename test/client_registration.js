@@ -1,4 +1,5 @@
 var joi = require('joi');
+var async = require('async');
 var should = require('should');
 var authenticate = require('../index')({
     models: {
@@ -327,6 +328,8 @@ describe('B2B Client', function () {
                 should(err).be.empty;
                 should.exist(userkey);
 
+                should(userkey.email).be.equal(regEmail);
+
                 myUserkey = userkey;
 
                 done();
@@ -383,4 +386,99 @@ describe('B2B Client', function () {
             });
         });
     });
+
+    it('Should be able to create & assign platform, domain & state', function (done) {
+        async.waterfall([
+            function (next) {
+                registration.createPlatform({
+                    ukey: myUserkey.key,
+                    email: myUserkey.email,
+                    apiurl: 'http://test.platform.example.com',
+                    callback: 'http://test.platform.example.com/callback',
+                    name: 'test platform',
+                    version: '0.0.1',
+                }, next);
+            },
+            function (platform, next) {
+
+                var platformSchema = joi.object().keys({
+                    _id: joi.string(),
+                    _rev: joi.string(),
+                    key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                    ukey: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                    email: joi.string().email(),
+                    apiurl: joi.string(),
+                    callback: joi.string(),
+                    name: joi.string(),
+                    version: joi.string(),
+                    salt: joi.string(),
+                    created: joi.number().required()
+                });
+
+                platformSchema.validate(platform, function (err, platform) {
+                    should(err).be.empty;
+                    should.exist(platform);
+
+                    next(null, platform);
+                });
+            },
+            function (platform, next) {
+                registration.createDomain({
+                    platform: platform.key,
+                    name: 'curency of platform',
+                    apiurl: 'http://test.platform.example.com'
+                }, next);
+            },
+            function (domain, next) {
+                var domainSchema = joi.object().keys({
+                    _id: joi.string(),
+                    _rev: joi.string(),
+                    key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                    platform: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                    apiurl: joi.string(),
+                    name: joi.string(),
+                    created: joi.number().required()
+                });
+
+                domainSchema.validate(domain, function (err, domain) {
+                    should(err).be.empty;
+                    should.exist(domain);
+
+                    next(null, domain);
+                });
+            },
+            function (domain, next) {
+                registration.createDomainState({
+                    domain: domain.key,
+                    name: 'live',
+                    state: {}
+                }, next);
+            },
+            function (domainState, next) {
+                var domainStateSchema = joi.object().keys({
+                    _id: joi.string(),
+                    _rev: joi.string(),
+                    key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                    domain: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                    state: joi.any(),
+                    name: joi.string(),
+                    created: joi.number().required()
+                });
+
+                domainStateSchema.validate(domainState, function (err, domainState) {
+                    should(err).be.empty;
+                    should.exist(domainState);
+
+                    next(null, domainState);
+                });
+            }
+        ], function (err, result) {
+            should(err).be.empty;
+
+            should.exist(result);
+
+            done();
+        });
+    });
+
 });
