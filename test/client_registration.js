@@ -19,6 +19,7 @@ var authenticate = require('../index')({
 
 describe('B2B Client', function () {
     var registration = new authenticate.registration();
+    var validation = new authenticate.validation();
 
     var regEmail = 'test_{{rand}}@example.com'.replace('{{rand}}', Math.random().toString(16).slice(2));
     var regRef;
@@ -97,7 +98,7 @@ describe('B2B Client', function () {
     });
 
     it('Should validate the fetched token', function (done) {
-        authenticate.validation({
+        validation.validate({
             accessToken: tokenState.token,
             uniqueKey: tokenState.relkey,
             scope: tokenState.scope
