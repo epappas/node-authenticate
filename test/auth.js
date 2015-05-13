@@ -110,6 +110,7 @@ describe('Auth AUKEY', function () {
                 _rev: joi.string(),
                 key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
                 scope: joi.array().items(joi.string()).required(),
+                relkey: joi.string(),
                 code: joi.string().required(),
                 state: joi.any(),
                 expires: joi.number().required(),
