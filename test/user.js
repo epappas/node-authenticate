@@ -33,9 +33,6 @@ describe('User - Domain accounts', function () {
     var myAukeySecret;
     var myOpenkeySecret;
     var myUserkey;
-    var myDecision;
-    var myCode;
-    var myNewAtoken;
 
     describe('Should registration create vitals', function () {
         it('Should Create a user account', function (done) {
@@ -401,6 +398,9 @@ describe('User - Domain accounts', function () {
     describe('OAUTH 2', function () {
 
         describe('CODE Flow', function () {
+            var myDecision;
+            var myCode;
+            var myNewAtoken;
 
             it('Should request login via auth', function (done) {
                 auth.authenticate({
@@ -509,7 +509,76 @@ describe('User - Domain accounts', function () {
         });
 
         describe('IMPLICIT Flow', function () {
-            // TODO
+            var myDecision;
+            var myCode;
+            var myNewAtoken;
+
+            it('Should request login via auth', function (done) {
+                auth.authenticate({
+                    method: 'GET',
+                    redirectUri: '/',
+                    apiKey: myAukey.key,
+                    responseType: 'token',
+                    scope: ['test'],
+                    state: {gameSession: 1234},
+                    userSession: {}
+                }, function (err, decision) {
+                    should(err).be.empty;
+                    should.exist(decision);
+
+                    var decisionSchema = joi.object().keys({
+                        _id: joi.string(),
+                        _rev: joi.string(),
+                        key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                        scope: joi.array().items(joi.string()).required(),
+                        html: joi.string().required(),
+                        state: joi.any(),
+                        expires: joi.number().required(),
+                        created: joi.number().required()
+                    });
+
+                    decisionSchema.validate(decision, function (err, decision) {
+                        should(err).be.empty;
+                        should.exist(decision);
+
+                        myDecision = decision;
+
+                        done();
+                    });
+                });
+            });
+
+            it('Should accept the request and issue an AUTH CODE', function (done) {
+                auth.authenticate({
+                    method: 'POST',
+                    redirectUri: '/',
+                    apiKey: myAukey.key,
+                    responseType: 'token',
+                    scope: ['test'],
+                    state: {gameSession: 1234},
+                    userSession: {},
+                    decision: 1
+                }, function (err, atoken) {
+                    should(err).be.empty;
+                    should.exist(atoken);
+
+                    var atokenSchema = joi.object().keys({
+                        access_token: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                        uniqueKey: joi.string().required(),
+                        salt: joi.string(),
+                        state: joi.any(),
+                        expires: joi.number().required(),
+                        expires_in: joi.number().required()
+                    });
+
+                    atokenSchema.validate(atoken, function (err, atoken) {
+                        should(err).be.empty;
+                        should.exist(atoken);
+
+                        done();
+                    });
+                });
+            });
         });
     });
 });

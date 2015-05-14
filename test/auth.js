@@ -142,17 +142,12 @@ describe('Auth AUKEY', function () {
             should.exist(atoken);
 
             var atokenSchema = joi.object().keys({
-                _id: joi.string(),
-                _rev: joi.string(),
-                key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
-                scope: joi.array().items(joi.string()).required(),
-                relkey: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
+                access_token: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
                 uniqueKey: joi.string().required(),
-                grantTypeList: joi.array().items(joi.string()),
                 salt: joi.string(),
                 state: joi.any(),
                 expires: joi.number().required(),
-                created: joi.number().required()
+                expires_in: joi.number().required()
             });
 
             atokenSchema.validate(atoken, function (err, atoken) {
