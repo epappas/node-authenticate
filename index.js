@@ -58,10 +58,11 @@ module.exports = function AuthModule(config) {
         }
     };
 
-    exports.registration    = require('./lib/registration')(exports.models, exports.events, config.registration);
-    exports.auth            = require('./lib/auth')(exports.models, exports.events, config.auth);
-    exports.token           = require('./lib/token')(exports.models, exports.events, config.token);
-    exports.validation      = require('./lib/validation')(exports.models, exports.events, config.validation);
+    exports.registration    = require('./lib/registration')(exports, exports.models, exports.events, config.registration);
+    exports.auth            = require('./lib/auth')(exports, exports.models, exports.events, config.auth);
+    exports.token           = require('./lib/token')(exports, exports.models, exports.events, config.token);
+    exports.validation      = require('./lib/validation')(exports, exports.models, exports.events, config.validation);
+    exports.bearerPlugin    = require('./lib/bearerPlugin')(exports, exports.models, exports.events, config.validation);
 
     return exports;
 };
