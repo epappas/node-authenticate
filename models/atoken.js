@@ -60,7 +60,7 @@ module.exports = function AccessTokenModel(config, nano) {
         _id: joi.string().default(cloneKey, '_id'),
         key: joi.string().default(generateUuid, 'key'),
         salt: joi.string().default(generateSalt, 'salt'),
-        uniqueKey: joi.string().default(setUniqueKey, 'uniqueKey'),
+        uniqueKey: joi.string(), // .default(setUniqueKey, 'uniqueKey'),
         relkey: joi.string(),
         expires: joi.number().default(generateExpiration, 'expires'),
         scope: joi.array().items(joi.string()),

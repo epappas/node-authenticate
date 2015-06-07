@@ -112,7 +112,7 @@ describe('B2B Client', function () {
                 _rev: joi.string(),
                 key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
                 salt: joi.string().required(),
-                uniqueKey: joi.string().required(),
+                uniqueKey: joi.string(), // .required(),
                 relkey: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
                 expires: joi.number().required(),
                 created: joi.number().required(),
@@ -140,7 +140,7 @@ describe('B2B Client', function () {
                 key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
                 relkey: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
                 salt: joi.string().required(),
-                uniqueKey: joi.string().required(),
+                uniqueKey: joi.string(), // .required(),
                 expires: joi.number().required(),
                 created: joi.number().required(),
                 scope: joi.array().items(joi.string()).required()

@@ -103,7 +103,7 @@ describe('Registration', function () {
                 _rev: joi.string(),
                 key: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
                 salt: joi.string().required(),
-                uniqueKey: joi.string().required(),
+                uniqueKey: joi.string(), // .required(),
                 relkey: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
                 expires: joi.number().required(),
                 created: joi.number().required(),

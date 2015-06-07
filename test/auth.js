@@ -143,7 +143,7 @@ describe('Auth AUKEY', function () {
 
             var atokenSchema = joi.object().keys({
                 access_token: joi.string().regex(/[a-zA-Z0-9\-]+/).required(),
-                uniqueKey: joi.string().required(),
+                uniqueKey: joi.string(), // .required(),
                 salt: joi.string(),
                 state: joi.any(),
                 expires: joi.number().required(),
