@@ -64,6 +64,7 @@ module.exports = function AccessCodeModel(config, nano) {
         decision: joi.boolean().validate(true),
         redirectUri: joi.string().uri(),
         state: joi.any().default({}),
+        internalState: joi.any().default({}),
         expires: joi.number().default(generateExpiration, 'expires'),
         scope: joi.array().items(joi.string()),
         created: joi.number().default(Date.now, 'created')

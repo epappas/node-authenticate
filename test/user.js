@@ -461,6 +461,7 @@ describe('User - Domain accounts', function () {
                         relkey: joi.string(),
                         code: joi.string().required(),
                         state: joi.any(),
+                        internalState: joi.any(),
                         expires: joi.number().required(),
                         created: joi.number().required()
                     });
