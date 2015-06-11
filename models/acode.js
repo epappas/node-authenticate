@@ -60,7 +60,7 @@ module.exports = function AccessCodeModel(config, nano) {
         _id: joi.string().default(cloneKey, '_id'),
         key: joi.string().default(generateUuid, 'key'),
         relkey: joi.string(),
-        code: joi.string().default(generateUuid, 'code'),
+        code: joi.string().default(cloneKey, 'code'),
         decision: joi.boolean().validate(true),
         redirectUri: joi.string().uri(),
         state: joi.any().default({}),
